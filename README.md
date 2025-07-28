@@ -95,7 +95,7 @@ python scripts/2_run_analysis_and_export.py
 # Step 3: Export to Parquet
 python scripts/3_create_parquet_export.py
 
-🚀 4. Launch the App
+# 4. Launch the App🚀
 
 streamlit run streamlit_app/App.py
 
