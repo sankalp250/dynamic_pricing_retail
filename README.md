@@ -13,7 +13,9 @@
 
 ### 🚀 Live Demonstrations
 
-*   **Live Streamlit Application:** [**Click here to view the live app**] https://dynamicpricingretail-wptjwk9uswhjzgqcekjg2f.streamlit.app/ *   **Live Tableau Dashboard:** [**Click here to view the live dashboard**]https://public.tableau.com/app/profile/sankalp.singh5474/viz/Book1_17535658131970/Dashboard1
+*   **Live Streamlit Application:** [**Click here to view the live app**] https://dynamicpricingretail-wptjwk9uswhjzgqcekjg2f.streamlit.app/ 
+
+*   **Live Tableau Dashboard:** [**Click here to view the live dashboard**]https://public.tableau.com/app/profile/sankalp.singh5474/viz/Book1_17535658131970/Dashboard1
 ---
 
 ### 📝 Project Summary & Purpose
@@ -89,7 +91,7 @@ For high-level, at-a-glance reporting, a summary of the key insights is presente
 
 The project is organized into a modular structure that separates the data processing backend, analysis code, and the frontend application.
 
-dynamic_pricing_retail/
+ynamic_pricing_retail/
 │
 ├── config/ # Configuration files (e.g., config.ini.template)
 ├── data/
@@ -102,15 +104,15 @@ dynamic_pricing_retail/
 │ ├── 2_run_analysis... # Runs analysis and updates local MySQL
 │ └── 3_create_parquet... # Exports final data for the app
 ├── src/
-│ ├── analysis/ # All analytical functions (elasticity, segmentation, etc.)
+│ ├── analysis/ # All analytical functions (elasticity, etc.)
 │ ├── data_processing/ # Data loading and cleaning functions
 │ └── database/ # Database connection utility
 ├── streamlit_app/
 │ ├── App.py # The main landing page of the Streamlit app
-│ ├── assets/ # CSS files and local images for the app
+│ ├── assets/ # CSS files and app images
 │ ├── components/ # Reusable UI components (plots, cards)
 │ ├── data/ # The final Parquet data file for the app
-│ └── pages/ # Each .py file here is a separate page in the app
+│ └── pages/ # Each .py file is a separate page in the app
 ├── .gitignore
 ├── README.md
 └── requirements.txt
@@ -135,11 +137,13 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-2. Set Up the Local MySQL Database
+**2. Set Up the Local MySQL Database**
+
 Log in to your MySQL client, then create the database and a dedicated user.
 Update the config/config.ini.template file with your credentials and rename it to config.ini.
 
-3. Run the Full Data Pipeline
+**3. Run the Full Data Pipeline**
+
 Place the Olist dataset CSV files into the data/raw/ directory.
 Run the scripts in order to process the data and create the final file for the app:
 
@@ -152,13 +156,13 @@ python scripts/2_run_analysis_and_export.py
 # 3. Creates the final data file for the Streamlit app to use
 python scripts/3_create_parquet_export.py
 
-4. Launch the Streamlit Application
+**4. Launch the Streamlit Application**
 
 streamlit run streamlit_app/App.py
 
 The application will now be running locally in its self-contained, high-performance mode.
 
-☁️ Deployment
+**☁️ Deployment**
 
 The Streamlit application is deployed on Streamlit Community Cloud, connected directly to this GitHub repository. The deployment is configured in a self-contained mode, reading from the master_data.parquet file. This architecture was chosen to ensure maximum reliability and speed for the public-facing application.```
 
