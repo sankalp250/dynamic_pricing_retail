@@ -36,32 +36,31 @@ Summarized Tableau dashboard for senior stakeholders.
 
 📁 Project Structure
 
-'''
 dynamic_pricing_retail/
-│
-├── config/                  # Configuration files (e.g., config.ini.template)
+├── config/                     # Configuration files (e.g., config.ini.template)
 ├── data/
-│   ├── raw/                 # Raw CSV data
-│   └── exports_for_tableau/ # Cleaned CSVs for Tableau
+│   ├── raw/                    # Raw CSV data
+│   └── exports_for_tableau/   # Cleaned CSVs for Tableau
 ├── docs/
-│   └── images/              # README screenshots
+│   └── images/                # README screenshots
 ├── scripts/
-│   ├── 1_run_etl.py         # Clean and load data into MySQL
-│   ├── 2_run_analysis_and_export.py # Analysis + MySQL update
-│   └── 3_create_parquet_export.py   # Export final Parquet
+│   ├── 1_run_etl.py           # Clean and load data into MySQL
+│   ├── 2_run_analysis_and_export.py  # Analysis + MySQL update
+│   └── 3_create_parquet_export.py    # Export final Parquet
 ├── src/
-│   ├── analysis/            # Analytical models (elasticity, segmentation)
-│   ├── data_processing/     # Data cleaning
-│   └── database/            # DB connection helpers
+│   ├── analysis/              # Analytical models (elasticity, segmentation)
+│   ├── data_processing/       # Data cleaning
+│   └── database/              # DB connection helpers
 ├── streamlit_app/
-│   ├── App.py               # Main Streamlit app
-│   ├── assets/              # CSS and images
-│   ├── components/          # Reusable UI parts
-│   ├── data/                # Final Parquet file
-│   └── pages/               # Streamlit sub-pages
+│   ├── App.py                 # Main Streamlit app
+│   ├── assets/                # CSS and images
+│   ├── components/            # Reusable UI parts
+│   ├── data/                  # Final Parquet file
+│   └── pages/                 # Streamlit sub-pages
 ├── .gitignore
 ├── README.md
-└── requirements.txt '''
+└── requirements.txt
+
 
 ⚙️ How to Reproduce Locally
 ✅ Prerequisites
