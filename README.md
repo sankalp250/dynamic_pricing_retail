@@ -36,6 +36,7 @@ Summarized Tableau dashboard for senior stakeholders.
 
 📁 Project Structure
 
+'''
 dynamic_pricing_retail/
 │
 ├── config/                  # Configuration files (e.g., config.ini.template)
@@ -60,7 +61,7 @@ dynamic_pricing_retail/
 │   └── pages/               # Streamlit sub-pages
 ├── .gitignore
 ├── README.md
-└── requirements.txt
+└── requirements.txt '''
 
 ⚙️ How to Reproduce Locally
 ✅ Prerequisites
