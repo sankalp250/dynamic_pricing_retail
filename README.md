@@ -91,3 +91,81 @@ For high-level, at-a-glance reporting, a summary of the key insights is presente
 ## 📂 Project Structure
 
 The project is organized into a modular structure that separates the data processing backend, analysis code, and the frontend application.
+
+dynamic_pricing_retail/
+│
+├── config/ # Configuration files (e.g., config.ini.template)
+├── data/
+│ ├── raw/ # Original, untouched CSV data files
+│ └── exports_for_tableau/# Aggregated CSVs ready for Tableau
+├── docs/
+│ └── images/ # Screenshots for the README
+├── scripts/
+│ ├── 1_run_etl.py # Cleans and loads data into local MySQL
+│ ├── 2_run_analysis... # Runs analysis and updates local MySQL
+│ └── 3_create_parquet... # Exports final data for the app
+├── src/
+│ ├── analysis/ # All analytical functions (elasticity, etc.)
+│ ├── data_processing/ # Data loading and cleaning functions
+│ └── database/ # Database connection utility
+├── streamlit_app/
+│ ├── App.py # The main landing page of the Streamlit app
+│ ├── assets/ # CSS files and app images
+│ ├── components/ # Reusable UI components (plots, cards)
+│ ├── data/ # The final Parquet data file for the app
+│ └── pages/ # Each .py file is a separate page in the app
+├── .gitignore
+├── README.md
+└── requirements.txt
+
+
+---
+
+## ⚙️ How to Reproduce Locally
+
+Follow these steps to set up the "Data Factory" and run the application on your own machine.
+
+**Prerequisites:**
+*   Python 3.9+
+*   MySQL Server
+
+**1. Clone the Repository & Set Up Environment**
+   ```bash
+   git clone https://github.com/sankalp250/dynamic_pricing_retail.git
+   cd dynamic_pricing_retail
+   python -m venv .venv
+   # Activate the environment (.venv\Scripts\activate for Windows)
+   source .venv/bin/activate
+   pip install -r requirements.txt
+
+2. Set Up the Local MySQL Database
+
+   Log in to your MySQL client, then create the database and a dedicated user.
+    Update the config/config.ini.template file with your credentials and rename it to config.ini.
+
+3. Run the Full Data Pipeline
+
+    Place the Olist dataset CSV files into the data/raw/ directory.
+    Run the scripts in order to process the data and create the final file for the app:
+    * Step 3.1: ETL - Cleans data and loads it into your local MySQL.  
+
+    python scripts/1_run_etl.py
+
+     *   **Step 3.2: Analysis** - Runs segmentation and updates the local MySQL table.
+   ```bash
+   python scripts/2_run_analysis_and_export.py
+   ```
+ *   **Step 3.3: Export** - Creates the final `.parquet` data file for the Streamlit app to use.
+   ```bash
+   python scripts/3_create_parquet_export.py
+   ```
+
+4. Launch the Streamlit Application
+
+    streamlit run streamlit_app/App.py
+
+The application will now be running locally in its self-contained, high-performance mode.
+
+☁️ Deployment
+
+The Streamlit application is deployed on Streamlit Community Cloud, connected directly to this GitHub repository. The deployment is configured in a self-contained mode, reading from the master_data.parquet file. This architecture was chosen to ensure maximum reliability and speed for the public-facing application.
