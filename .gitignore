@@ -1,0 +1,33 @@
+# .gitignore
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# IDE and OS files
+.idea/
+.vscode/
+*.DS_Store
+.ipynb_checkpoints
+
+# Configuration - IMPORTANT!
+config/config.ini
+
+# Large data files
+# We often ignore the raw data if it's too large for a repo.
+# If your repo is private and data is small, you can comment this out.
+data/raw/
+data/exports_for_tableau/
+
+# Packages
+*.egg-info/
+dist/
+build/

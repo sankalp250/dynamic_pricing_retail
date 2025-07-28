@@ -1,0 +1,51 @@
+/* streamlit_app/assets/style.css */
+
+/* General Styling */
+body {
+    font-family: 'sans-serif';
+}
+
+/* Style for KPI Metric Cards */
+div.metric-card {
+    background-color: #262730; /* Dark background for the card */
+    border: 1px solid #262730;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+}
+
+div.metric-card:hover {
+    transform: scale(1.05); /* Add a little pop on hover */
+}
+
+h3.metric-title {
+    color: #4F8BF9; /* A blue accent for the title */
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+p.metric-value {
+    color: #FFFFFF; /* White text for the value */
+    font-size: 28px;
+    font-weight: bold;
+}
+
+p.metric-delta {
+    color: #29B09D; /* Green for positive change, can be adapted */
+    font-size: 14px;
+}
+
+/* --- For darker themes or cards --- */
+.stApp a:link, .stApp a:visited {
+    color: #4F8BF9; /* Brighten links to be visible on dark backgrounds */
+}
+
+/* Make Streamlit's default components fit the dark theme */
+.stSelectbox div[data-baseweb="select"] > div {
+    background-color: #262730;
+    color: white;
+    border-radius: 8px;
+}

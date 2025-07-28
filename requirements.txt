@@ -1,0 +1,17 @@
+pandas
+scikit-learn
+statsmodels
+numpy
+
+# --- Database Connection ---
+mysql-connector-python
+SQLAlchemy
+
+# --- Visualization & Web App ---
+streamlit
+plotly
+seaborn
+
+# --- Utilities ---
+openpyxl
+prophet

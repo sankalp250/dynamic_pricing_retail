@@ -1,0 +1,9 @@
+[mysql]
+host = localhost
+user = pricing_app_user
+password = YOUR_DATABASE_PASSWORD_HERE
+database = dynamic_pricing_db
+
+[data_paths]
+raw_data_dir = data/raw
+tableau_exports_dir = data/exports_for_tableau
