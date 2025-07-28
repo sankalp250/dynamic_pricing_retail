@@ -6,9 +6,11 @@ import sys
 import os
 import plotly.express as px
 
+# --- Path setup ---
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-from src.database.utils import get_db_engine
-from streamlit_app.components.plots import fetch_data_from_db
+
+# --- Corrected Imports (Reads from Parquet file, NO database) ---
+from streamlit_app.components.plots import fetch_data_from_parquet
 from streamlit_app.components.kpi_cards import create_kpi_card
 
 st.set_page_config(page_title="Customer Intelligence", layout="wide")
@@ -22,12 +24,12 @@ local_css(css_path)
 st.title("👥 Customer Intelligence")
 st.markdown("Select a tab below for a detailed breakdown of each customer segment.")
 
-# --- Load Data ---
-engine = get_db_engine()
-if engine is None: st.error("Database connection failed."); st.stop()
-df = fetch_data_from_db(engine)
+# --- Corrected Data Fetching ---
+df = fetch_data_from_parquet()
+
 if df.empty or 'customer_segment' not in df.columns or df['customer_segment'].isnull().all():
-    st.warning("Customer segment data not found. Please run the Analysis script first."); st.stop()
+    st.warning("Customer segment data not found in the data file. Please run `scripts/3_create_parquet_export.py` to generate it.")
+    st.stop()
 st.markdown("<hr>", unsafe_allow_html=True)
 
 # --- Segment Tabs for individual details ---
@@ -64,7 +66,7 @@ for i, tab in enumerate(tabs):
         if not segment_df.empty:
             top_products = segment_df['product_category_name_english'].value_counts().nlargest(5).reset_index()
             top_products.columns = ['Product Category', 'Number of Purchases']
-            fig_bar = px.bar(top_products, x='Number of Purchases', y='Product Category', orientation='h')
+            fig_bar = px.bar(top_products, x='Number of Purchases', y='Product Category', orientation='h', title=f"Most Popular Categories for {segment_names[segment_id]}")
             fig_bar.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_bar, use_container_width=True)
         else:

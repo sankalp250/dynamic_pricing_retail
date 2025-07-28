@@ -6,21 +6,20 @@ import plotly.graph_objects as go
 import streamlit as st
 import numpy as np
 
-# A decorator to cache the data, so we don't hit the database on every interaction.
-# ttl=600 means the cache will expire after 600 seconds (10 minutes).
-@st.cache_data(ttl=600)
-def fetch_data_from_db(_engine):
+@st.cache_data
+def fetch_data_from_parquet():
     """
-    Fetches the entire master_table from the database.
-    The _engine parameter is used by st.cache_data to detect changes.
+    Fetches the pre-processed data from the Parquet file.
+    This makes the app self-contained and removes the database dependency.
     """
+    file_path = "streamlit_app/data/master_data.parquet"
     try:
-        df = pd.read_sql('SELECT * FROM master_table', _engine)
+        df = pd.read_parquet(file_path)
         df['order_purchase_timestamp'] = pd.to_datetime(df['order_purchase_timestamp'])
         df['customer_segment'] = df['customer_segment'].astype('category')
         return df
-    except Exception as e:
-        st.error(f"Failed to fetch data from database: {e}")
+    except FileNotFoundError:
+        st.error(f"Data file not found at {file_path}. Please run `scripts/3_create_parquet_export.py` first.")
         return pd.DataFrame()
 
 def create_sales_overview_line_chart(df):

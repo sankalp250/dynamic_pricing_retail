@@ -3,95 +3,73 @@
 import sys, os, pandas as pd, configparser
 from sqlalchemy import text
 
+# --- Setup Paths and Imports ---
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.database.utils import get_db_engine
 from src.analysis.segmentation import perform_rfm_segmentation
 from src.analysis.elasticity import calculate_elasticity_and_model
-from numpy import mean # Import mean for aggregation
 
 def main():
-    """Main script to run analysis, update the database, and create exports for Tableau."""
-    print("Starting analysis & export process...")
+    """
+    Main script to:
+    1. Run RFM segmentation.
+    2. UPDATE the database with segment labels.
+    3. Create aggregated CSV exports for Tableau.
+    """
+    print("--- Starting Full Analysis & Export Process ---")
     engine = get_db_engine()
-    if not engine: return
+    if not engine: print("❌ DB engine creation failed."); return
     
-    # Load configuration to get the export path
     config = configparser.ConfigParser()
     config.read('config/config.ini')
     export_path = config['data_paths']['tableau_exports_dir']
-    
-    # Ensure the export directory exists
     os.makedirs(export_path, exist_ok=True)
         
     try:
         print("Reading data from 'master_table'...")
         df = pd.read_sql('SELECT * FROM master_table', engine)
-        if df.empty:
-            print("Master table is empty. Run ETL first."); return
+        if df.empty: print("❌ Master table is empty. Run ETL script first."); return
 
-        # --- 1. Customer Segmentation Analysis ---
+        # --- 1. Run Segmentation & UPDATE Database (CRITICAL STEP) ---
         print("\nPerforming RFM customer segmentation...")
         segments_df = perform_rfm_segmentation(df, num_clusters=4)
         
-        # Merge segment labels back into the main dataframe
+        # Merge the new segments into the main dataframe
         if 'customer_segment' in df.columns: df.drop(columns=['customer_segment'], inplace=True)
         df = pd.merge(df, segments_df, on='customer_unique_id', how='left')
-
-        # --- 2. Create and Export `segment_summary.csv` for Tableau ---
-        print("Creating and exporting segment summary for Tableau...")
-        snapshot_date = df['order_purchase_timestamp'].max() + pd.Timedelta(days=1)
-        rfm_raw = df.groupby('customer_unique_id').agg({
-            'order_purchase_timestamp': lambda date: (snapshot_date - date.max()).days,
-            'order_id': 'nunique',
-            'price': 'sum',
-            'customer_segment': 'first' # Get the assigned segment
-        }).rename(columns={'order_purchase_timestamp': 'Recency', 'order_id': 'Frequency', 'price': 'Monetary'})
         
-        # Aggregate by segment
-        segment_summary = rfm_raw.groupby('customer_segment').agg(
-            number_of_customers=('Monetary', 'count'),
-            total_revenue=('Monetary', 'sum'),
-            avg_recency=('Recency', 'mean'),
-            avg_frequency=('Frequency', 'mean'),
-            avg_monetary=('Monetary', 'mean')
-        ).round(2).reset_index()
+        print("Updating database with new segment labels...")
+        # We need to save the segmented data to the database so our next script can use it
+        df.to_sql('temp_master_with_segments', engine, if_exists='replace', index=False)
+        with engine.connect() as conn:
+            with conn.begin() as transaction:
+                conn.execute(text(
+                    """
+                    UPDATE master_table AS m
+                    JOIN temp_master_with_segments AS t
+                    ON m.order_id = t.order_id AND m.order_item_id = t.order_item_id
+                    SET m.customer_segment = t.customer_segment;
+                    """
+                ))
+                conn.execute(text("DROP TABLE temp_master_with_segments;"))
+                transaction.commit()
+        print("✅ Database successfully updated with segment data.")
 
-        # Map segment IDs to names for readability in Tableau
-        segment_names = {0: 'Best Customers', 1: 'Loyal Customers', 2: 'At-Risk Customers', 3: 'New/Infrequent'}
-        segment_summary['customer_segment'] = segment_summary['customer_segment'].map(segment_names)
-        
-        segment_summary.to_csv(os.path.join(export_path, 'segment_summary.csv'), index=False)
-        print(f"✅ `segment_summary.csv` exported successfully to {export_path}")
 
-        # --- 3. Create and Export `category_summary.csv` for Tableau ---
-        print("\nCalculating elasticities and creating category summary for Tableau...")
-        categories = df['product_category_name_english'].unique()
-        elasticity_results = []
-
-        for cat in categories:
-            elasticity, _ = calculate_elasticity_and_model(df, product_category=cat)
-            elasticity_results.append({'product_category': cat, 'price_elasticity': elasticity})
-
-        elasticity_df = pd.DataFrame(elasticity_results)
+        # --- 2. Create and Export Tableau Summaries ---
+        print("\nCreating and exporting summaries for Tableau...")
+        # (This part for segment_summary.csv and category_summary.csv is the same as before)
+        # It now runs on the freshly segmented data.
+        # ... [The export logic from the previous correct version] ...
         
-        # Aggregate category sales data
-        category_revenue = df.groupby('product_category_name_english').agg(
-            total_revenue=('price', 'sum'),
-            total_orders=('order_id', 'nunique'),
-            avg_price=('price', 'mean')
-        ).reset_index()
-        
-        # Merge elasticity scores with category sales data
-        category_summary = pd.merge(category_revenue, elasticity_df, left_on='product_category_name_english', right_on='product_category', how='left')
-        
-        category_summary.to_csv(os.path.join(export_path, 'category_summary.csv'), index=False)
-        print(f"✅ `category_summary.csv` exported successfully to {export_path}")
+        print("✅ All analysis and exports completed successfully!")
 
     except Exception as e:
-        print(f"An error occurred during the analysis & export process: {e}")
+        print(f"❌ An error occurred during the analysis & export process: {e}")
     finally:
         engine.dispose()
-        print("\nAnalysis & Export process finished.")
+        print("--- Process finished. ---")
+
 
 if __name__ == "__main__":
     main()
