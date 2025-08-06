@@ -98,6 +98,7 @@ python scripts/3_create_parquet_export.py
 # 4. Launch the App🚀
 
 streamlit run streamlit_app/App.py
+https://dynamicpricingretail-wptjwk9uswhjzgqcekjg2f.streamlit.app/
 
 ☁️ Deployment
 
